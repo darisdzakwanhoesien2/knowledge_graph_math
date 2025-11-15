@@ -1,0 +1,31 @@
+{
+  "subject": "Numerical Matrix Analysis",
+  "code": "NMA001",
+  "description": "A comprehensive collection of the fundamental concepts, matrix factorizations, error and stability analyses, iterative methods, spectral algorithms, and matrix functions used in numerical linear algebra.",
+  "node_count": 48,
+  "derivation_count": 12,
+  "narrative_chapters": 10,
+  "root_topics": [
+    "Matrix Basics",
+    "Matrix Factorizations",
+    "Solving Linear Systems",
+    "Spectral Methods",
+    "Krylov Methods",
+    "Matrix Functions",
+    "Numerical Stability",
+    "Applications"
+  ],
+  "prerequisites": [
+    "Multivariable Calculus",
+    "Linear Algebra",
+    "Basic Real Analysis",
+    "Computational Foundations"
+  ],
+  "recommended_reading": [
+    "Trefethen & Bau — Numerical Linear Algebra",
+    "Golub & Van Loan — Matrix Computations",
+    "Horn & Johnson — Matrix Analysis"
+  ],
+  "version": "1.0",
+  "created": "2025-11-15"
+}

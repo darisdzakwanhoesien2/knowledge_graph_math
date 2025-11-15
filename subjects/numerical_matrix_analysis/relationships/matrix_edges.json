@@ -1,0 +1,43 @@
+[
+  { "source": "Vector_Norms", "target": "Matrix_Norms", "relation": "induces" },
+  { "source": "Vector_Norms", "target": "Conditioning", "relation": "used_in" },
+  { "source": "Vector_Norms", "target": "Stability", "relation": "affects" },
+
+  { "source": "Matrix_Norms", "target": "Conditioning", "relation": "defines" },
+  { "source": "Matrix_Norms", "target": "Stability", "relation": "influences" },
+  { "source": "Matrix_Norms", "target": "Matrix_Exponential", "relation": "used_in" },
+
+  { "source": "Floating_Point_Arithmetic", "target": "Backward_Error", "relation": "causes" },
+  { "source": "Backward_Error", "target": "Forward_Error", "relation": "bounds" },
+  { "source": "Conditioning", "target": "Forward_Error", "relation": "amplifies" },
+
+  { "source": "Matrix_Norms", "target": "LU_Factorization", "relation": "analyzes" },
+  { "source": "LU_Factorization", "target": "Gaussian_Elimination", "relation": "implements" },
+  { "source": "LU_Factorization", "target": "Pivoting", "relation": "requires" },
+
+  { "source": "Cholesky_Factorization", "target": "Positive_Definite_Matrices", "relation": "requires" },
+  { "source": "Cholesky_Factorization", "target": "Triangular_Systems", "relation": "produces" },
+
+  { "source": "QR_Factorization", "target": "Least_Squares", "relation": "solves" },
+  { "source": "QR_Factorization", "target": "SVD", "relation": "related_to" },
+
+  { "source": "SVD", "target": "Low_Rank_Approximations", "relation": "enables" },
+  { "source": "SVD", "target": "PCA_Numerical", "relation": "underpins" },
+  { "source": "SVD", "target": "Matrix_Exponential", "relation": "diagonalizes" },
+
+  { "source": "Eigenvalue_Decomposition", "target": "Power_Iteration", "relation": "approximated_by" },
+  { "source": "Power_Iteration", "target": "Rayleigh_Quotient_Iteration", "relation": "generalized_by" },
+  { "source": "Arnoldi_Iteration", "target": "Krylov_Subspace_Methods", "relation": "is_instance_of" },
+  { "source": "Lanczos_Method", "target": "Arnoldi_Iteration", "relation": "special_case_for_SPD" },
+
+  { "source": "Matrix_Exponential", "target": "Matrix_Logarithm", "relation": "inverse_of" },
+  { "source": "Matrix_Exponential", "target": "Numerical_Solution_of_ODEs", "relation": "used_in" },
+
+  { "source": "Gershgorin_Theorem", "target": "Eigenvalue_Decomposition", "relation": "bounds" },
+  { "source": "Interlacing_Theorem", "target": "SVD", "relation": "related_to" },
+
+  { "source": "Conditioning", "target": "Jacobi_Method", "relation": "affects_convergence" },
+  { "source": "Conditioning", "target": "Gauss_Seidel_Method", "relation": "affects_convergence" },
+
+  { "source": "Graph_Laplacian_Eigenvalues", "target": "Power_Iteration", "relation": "computed_with" }
+]
