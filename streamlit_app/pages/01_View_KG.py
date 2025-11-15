@@ -6,68 +6,62 @@ import os
 st.set_page_config(layout="wide")
 st.title("🕸️ Knowledge Graph Viewer")
 
-
-# =============================
-# Graph Mode Selection
-# =============================
+# Determine graph mode
 mode = st.radio("Select Graph:", ["Subject Graph", "Global Graph"])
 
+# Read selected node from query parameter
+selected_node = st.query_params.get("selected_node", None)
 
-# =============================
+
+# ======================================================================
+# SIDEBAR: Node selected → show button to open Markdown page
+# ======================================================================
+with st.sidebar:
+    st.header("📌 Node Selection")
+
+    if selected_node:
+        st.success(f"**Selected Node:** {selected_node}")
+
+        if st.button("📖 Open Markdown Page"):
+            # Redirect user to Subject Browser
+            st.query_params["node"] = selected_node
+            st.switch_page("pages/03_Subject_Browser.py")
+
+    else:
+        st.info("Click a node in the graph to select it.")
+
+
+# ======================================================================
 # SUBJECT GRAPH MODE
-# =============================
+# ======================================================================
 if mode == "Subject Graph":
 
-    # Detect subjects directory
     subjects_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "../../subjects")
     )
 
-    if not os.path.exists(subjects_dir):
-        st.error(f"❌ Subjects directory not found:\n{subjects_dir}")
-        st.stop()
+    subjects = [d for d in os.listdir(subjects_dir)
+                if os.path.isdir(os.path.join(subjects_dir, d))]
 
-    subjects = [
-        d for d in os.listdir(subjects_dir)
-        if os.path.isdir(os.path.join(subjects_dir, d))
-    ]
-
-    if not subjects:
-        st.warning("⚠️ No subjects found in /subjects directory.")
-        st.stop()
-
-    # Subject dropdown
     subject = st.selectbox("Select subject:", subjects)
 
-    # Build graph for the selected subject
     html_path = build_subject_graph(subject)
 
-    st.info(
-        "💡 **Tip:** Click any blue node in the graph to open its Markdown page.\n"
-        "This automatically navigates to:\n"
-        "➡️ **Subject Browser → (subject) → (node)**"
-    )
+    st.info("Click any node to select it. Use the sidebar to open its Markdown page.")
 
-    # Render graph HTML
     with open(html_path, "r", encoding="utf-8") as f:
         html_str = f.read()
 
-    # Display inside iframe (no sandbox options required)
     html(html_str, height=800, scrolling=True)
 
 
-# =============================
+# ======================================================================
 # GLOBAL GRAPH MODE
-# =============================
+# ======================================================================
 else:
-
-    # Build global graph file
     html_path = build_global_graph()
 
-    st.info(
-        "🌍 **Global Knowledge Graph:** merged view of all subjects.\n"
-        "Clicking a node opens its Markdown page (if subject is known)."
-    )
+    st.info("Global KG: Click any node to select it. Use the sidebar to open the Markdown page.")
 
     with open(html_path, "r", encoding="utf-8") as f:
         html_str = f.read()
