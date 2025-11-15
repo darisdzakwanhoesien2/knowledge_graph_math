@@ -1,10 +1,11 @@
-subject/introduction_to_optimization/narrative/01_intro_to_matrix_computation.md
+subject/numerical_matrix_analysis/narrative/01_intro_to_matrix_computation.md
 
-subject/introduction_to_optimization/derivations/1. Derivation_p_Norm_Properties.md
+subject/numerical_matrix_analysis/derivations/1. Derivation_p_Norm_Properties.md
 
-subject/introduction_to_optimization/nodes/Vector_Norms.md
+subject/numerical_matrix_analysis/nodes/Vector_Norms.md
 
 streamlit_app/utils/graph_builder.py
+
 
 subjects/
 └── numerical_matrix_analysis/
