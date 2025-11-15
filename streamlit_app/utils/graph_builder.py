@@ -4,24 +4,57 @@ from pyvis.network import Network
 from utils.loaders import load_relationships, load_subject_nodes
 
 
-# =========================================================
-# Helper Function — Create Clickable Label
-# =========================================================
-def clickable_label(text, subject=None):
+# ============================================================================
+# Helper: Inject custom JS into PyVis HTML to make nodes clickable
+# ============================================================================
+def inject_click_js(html_file):
+
+    with open(html_file, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    custom_js = """
+    <script>
+    // When a node is clicked, redirect to its URL
+    network.on("click", function(params) {
+        if (params.nodes.length > 0) {
+            var nodeId = params.nodes[0];
+            var node = network.body.data.nodes.get(nodeId);
+
+            // Extract URL stored in node's 'title' via <a href="...">
+            var div = document.createElement('div');
+            div.innerHTML = node.title;
+            var link = div.querySelector('a');
+
+            if (link && link.href) {
+                window.parent.location.href = link.href;
+            }
+        }
+    });
+    </script>
     """
-    Produce HTML label for a PyVis node.
-    If subject is provided → clickable link opens Subject Browser.
-    """
-    if subject:
-        link = f"/Subject_Browser?subject={subject}&node={text}"
-        return f'<a href="{link}" target="_parent">{text}</a>'
-    else:
-        return f'<span style="color:#bbb;">{text}</span>'  # non-clickable (missing node)
+
+    # Insert JS before </body>
+    html = html.replace("</body>", custom_js + "\n</body>")
+
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(html)
 
 
-# =========================================================
-# Build SUBJECT Graph (auto-add missing nodes)
-# =========================================================
+# ============================================================================
+# Helper: Create HTML link for tooltip (title), label stays clean text
+# ============================================================================
+def make_clickable_title(node_name, subject):
+    """
+    Returns HTML <a> that PyVis will show in the tooltip.
+    The JavaScript click handler extracts this URL.
+    """
+    url = f"/Subject_Browser?subject={subject}&node={node_name}"
+    return f'<a href="{url}" target="_parent">Open {node_name}</a>'
+
+
+# ============================================================================
+# Build Subject Graph (auto-add missing nodes)
+# ============================================================================
 def build_subject_graph(subject):
 
     nodes = load_subject_nodes(subject)
@@ -29,7 +62,7 @@ def build_subject_graph(subject):
 
     output_path = f"{subject}_graph.html"
 
-    # Create PyVis graph
+    # Build PyVis network
     net = Network(
         height="750px",
         width="100%",
@@ -38,69 +71,71 @@ def build_subject_graph(subject):
         font_color="white"
     )
 
-    # More stable layout
     net.force_atlas_2based(gravity=-50)
 
-    # ---------------------------------------------------------
-    # 1. Add existing nodes (clickable)
-    # ---------------------------------------------------------
+    # ----------------------------------------------------------
+    # 1. Add existing nodes (clean label, clickable tooltip)
+    # ----------------------------------------------------------
     for node_name in nodes.keys():
+
         net.add_node(
             node_name,
-            label=clickable_label(node_name, subject),
-            title=node_name,
+            label=node_name,                                # clean readable label
+            title=make_clickable_title(node_name, subject), # HTML link in tooltip
             shape="dot",
             size=18,
-            color="#6AAFFF",     # blue for real nodes
+            color="#6AAFFF",  # blue = real node
         )
 
-    # ---------------------------------------------------------
-    # 2. Add missing nodes (non-clickable gray)
-    # ---------------------------------------------------------
+    # ----------------------------------------------------------
+    # 2. Add missing nodes (gray, not clickable)
+    # ----------------------------------------------------------
     for edge in relationships:
         src = edge["source"]
         tgt = edge["target"]
 
-        # Add source if missing
         if src not in net.get_nodes():
             net.add_node(
                 src,
-                label=clickable_label(src, None),
+                label=src,
                 title=f"{src} (missing node file)",
                 shape="dot",
                 size=14,
                 color="#888888",
             )
 
-        # Add target if missing
         if tgt not in net.get_nodes():
             net.add_node(
                 tgt,
-                label=clickable_label(tgt, None),
+                label=tgt,
                 title=f"{tgt} (missing node file)",
                 shape="dot",
                 size=14,
                 color="#888888",
             )
 
-    # ---------------------------------------------------------
+    # ----------------------------------------------------------
     # 3. Add edges
-    # ---------------------------------------------------------
+    # ----------------------------------------------------------
     for edge in relationships:
-        src = edge["source"]
-        tgt = edge["target"]
-        rel = edge.get("relation", "")
+        net.add_edge(
+            edge["source"],
+            edge["target"],
+            title=edge.get("relation", "")
+        )
 
-        net.add_edge(src, tgt, title=rel)
-
-    # Save interactive HTML
+    # Save graph
     net.save_graph(output_path)
+
+    # Add JavaScript click handler
+    inject_click_js(output_path)
+
     return output_path
 
 
-# =========================================================
-# Build GLOBAL Graph (merged subjects)
-# =========================================================
+# ============================================================================
+# Build Global Graph (cross-subject)
+# ============================================================================
 def build_global_graph():
 
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
@@ -114,7 +149,7 @@ def build_global_graph():
 
     output_path = "global_graph.html"
 
-    # Graph object
+    # Construct global PyVis network
     net = Network(
         height="850px",
         width="100%",
@@ -125,49 +160,51 @@ def build_global_graph():
 
     net.force_atlas_2based(gravity=-50)
 
-    # ---------------------------------------------------------
-    # 1. Build mapping from node → subject
-    # ---------------------------------------------------------
+    # ----------------------------------------------------------
+    # Map node → subject to enable cross-subject navigation
+    # ----------------------------------------------------------
     subjects_dir = os.path.join(base_dir, "subjects")
     subject_map = {}
 
     for subject in os.listdir(subjects_dir):
         subnodes = load_subject_nodes(subject)
-        for node in subnodes.keys():
-            subject_map[node] = subject
+        for n in subnodes.keys():
+            subject_map[n] = subject
 
-    # ---------------------------------------------------------
-    # 2. Add nodes (clickable if we know the subject)
-    # ---------------------------------------------------------
+    # ----------------------------------------------------------
+    # Add nodes for global graph
+    # ----------------------------------------------------------
     for edge in edges:
         src = edge["source"]
         tgt = edge["target"]
 
-        # SOURCE node
+        # Add source node
         if src not in net.get_nodes():
             if src in subject_map:
-                label = clickable_label(src, subject_map[src])
+                title = make_clickable_title(src, subject_map[src])
                 color = "#6AAFFF"
             else:
-                label = clickable_label(src, None)
-                color = "#999999"
+                title = f"{src} (missing node file)"
+                color = "#888888"
 
-            net.add_node(src, label=label, color=color)
+            net.add_node(src, label=src, title=title, color=color)
 
-        # TARGET node
+        # Add target node
         if tgt not in net.get_nodes():
             if tgt in subject_map:
-                label = clickable_label(tgt, subject_map[tgt])
+                title = make_clickable_title(tgt, subject_map[tgt])
                 color = "#6AAFFF"
             else:
-                label = clickable_label(tgt, None)
-                color = "#999999"
+                title = f"{tgt} (missing node file)"
+                color = "#888888"
 
-            net.add_node(tgt, label=label, color=color)
+            net.add_node(tgt, label=tgt, title=title, color=color)
 
         # Add edge
         net.add_edge(src, tgt)
 
-    # Save file
+    # Save & inject JS
     net.save_graph(output_path)
+    inject_click_js(output_path)
+
     return output_path
