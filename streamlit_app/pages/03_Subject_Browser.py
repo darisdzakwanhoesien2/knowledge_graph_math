@@ -1,30 +1,30 @@
 import streamlit as st
 from utils.loaders import list_subjects, load_subject_nodes
 from utils.file_reader import read_markdown
-import os
 
 st.title("📘 Subject Browser")
 
-# Auto-detect available subjects
+# Detect query parameters from KG Viewer
+params = st.query_params
+
+query_subject = params.get("subject", None)
+query_node = params.get("node", None)
+
 subjects = list_subjects()
 
-if not subjects:
-    st.error("No subjects found in /subjects directory.")
-    st.stop()
+# Select subject (defaults to graph-click)
+subject = st.selectbox("Select subject:", subjects, index=subjects.index(query_subject) if query_subject in subjects else 0)
 
-subject = st.selectbox("Select subject:", subjects)
+nodes = load_subject_nodes(subject)
+node_names = list(nodes.keys())
 
-# Try loading nodes
-try:
-    nodes = load_subject_nodes(subject)
-except FileNotFoundError:
-    st.error(f"Subject '{subject}' does not contain a nodes/ directory.")
-    st.stop()
+# Node dropdown (defaults to graph-click)
+if query_node in node_names:
+    node_idx = node_names.index(query_node)
+else:
+    node_idx = 0
 
-if not nodes:
-    st.warning(f"No nodes found in subject '{subject}'.")
-    st.stop()
+selected_node = st.selectbox("Select node:", node_names, index=node_idx)
 
-selected_node = st.selectbox("Select node:", list(nodes.keys()))
-
-st.markdown(read_markdown(nodes[selected_node]))
+# Render Markdown
+st.markdown(read_markdown(nodes[selected_node]), unsafe_allow_html=True)
