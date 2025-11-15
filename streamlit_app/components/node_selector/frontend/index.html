@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <script>
+        // Will send the selected node ID back to Streamlit
+        window.addEventListener("message", (event) => {
+            if (event.data.type === "node_click") {
+                Streamlit.setComponentValue(event.data.node);
+            }
+        });
+
+        // Ensure component is 0 height (invisible)
+        window.addEventListener("load", () => {
+            Streamlit.setFrameHeight(0);
+        });
+    </script>
+</head>
+<body></body>
+</html>

@@ -8,34 +8,34 @@ from utils.loaders import load_relationships, load_subject_nodes
 # Inject JS: When clicking PyVis node → update Streamlit query params
 # ============================================================================
 def inject_click_js(html_file):
-    """
-    Inject JS into saved PyVis HTML:
-    When a node is clicked, update the parent window's URL query parameter:
-        ?selected_node=<ID>
-    """
+    """Inject JS so that clicking a node updates the parent Streamlit URL."""
     with open(html_file, "r", encoding="utf-8") as f:
         html = f.read()
 
     custom_js = """
     <script>
-    // Update URL parameter in Streamlit when a node is clicked
+    // Ensure "network" is available
     network.on("click", function(params) {
-        if (params.nodes.length > 0) {
-            var nodeId = params.nodes[0];
+        if (params.nodes && params.nodes.length > 0) {
+            const nodeId = params.nodes[0];
 
-            // Update parent browser URL
-            const base = window.parent.location.origin + window.parent.location.pathname;
+            // Update the parent URL without reloading iframe
+            const parent = window.parent;
+            const base = parent.location.origin + parent.location.pathname;
             const newUrl = base + "?selected_node=" + encodeURIComponent(nodeId);
-            window.parent.history.replaceState({}, "", newUrl);
+
+            parent.history.replaceState(null, "", newUrl);
         }
     });
     </script>
     """
 
+    # Insert BEFORE </body>
     html = html.replace("</body>", custom_js + "\n</body>")
 
     with open(html_file, "w", encoding="utf-8") as f:
         f.write(html)
+
 
 
 # ============================================================================

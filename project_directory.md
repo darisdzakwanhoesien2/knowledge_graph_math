@@ -4,7 +4,16 @@
 
   📄 README.md<br>
   📄 numerical_matrix_analysis_graph.html<br>
+  📄 project_directory.md<br>
 <details><summary>📁 streamlit_app/</summary>
+  <details><summary>📁 components/</summary>
+    <details><summary>📁 node_selector/</summary>
+      <details><summary>📁 frontend/</summary>
+          📄 index.html<br>
+      </details>
+        📄 init.py<br>
+    </details>
+  </details>
   <details><summary>📁 pages/</summary>
       📄 01_View_KG.py<br>
       📄 02_Search_Node.py<br>
@@ -33,6 +42,8 @@
         📄 02_matrix_and_vector_norms.md<br>
     </details>
     <details><summary>📁 nodes/</summary>
+        📄 Conditioning.md<br>
+        📄 Matrix_Norms.md<br>
         📄 Vector_Norms.md<br>
     </details>
     <details><summary>📁 relationships/</summary>
