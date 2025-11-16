@@ -52,3 +52,20 @@ def load_relationships(subject):
         edges = json.load(f)
 
     return edges
+
+def get_node_subject(node_name):
+    """
+    Given a node name, return the subject directory it belongs to.
+    """
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../subjects"))
+
+    for subject in os.listdir(base_dir):
+        subject_path = os.path.join(base_dir, subject, "nodes")
+        if not os.path.exists(subject_path):
+            continue
+
+        for f in os.listdir(subject_path):
+            if f.replace(".md", "") == node_name:
+                return subject
+
+    return None

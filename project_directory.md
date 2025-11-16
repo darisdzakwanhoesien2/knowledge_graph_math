@@ -8,10 +8,10 @@
 <details><summary>📁 streamlit_app/</summary>
   <details><summary>📁 components/</summary>
     <details><summary>📁 node_selector/</summary>
+        📄 __init__.py<br>
       <details><summary>📁 frontend/</summary>
           📄 index.html<br>
       </details>
-        📄 init.py<br>
     </details>
   </details>
   <details><summary>📁 pages/</summary>
@@ -31,6 +31,10 @@
   📄 structure_code.py<br>
 <details><summary>📁 subjects/</summary>
   <details><summary>📁 introduction_to_optimization/</summary>
+      📄 index.json<br>
+    <details><summary>📁 nodes/</summary>
+        📄 Optimization_Problem_Formulation.md<br>
+    </details>
   </details>
   <details><summary>📁 numerical_matrix_analysis/</summary>
     <details><summary>📁 derivations/</summary>

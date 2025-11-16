@@ -1,0 +1,37 @@
+{
+  "subject": "introduction_to_optimization",
+  "title": "Introduction to Optimization — Super Derivation Edition",
+  "description": "A comprehensive mathematical knowledge graph covering foundations, convexity, optimality conditions, duality, gradient methods, Newton methods, constrained optimization, convex programs, nonsmooth optimization, and applications.",
+  "version": "1.0.0",
+  "authors": [
+    "Daris Dzakwan Hoesien",
+    "Knowledge Graph Auto-Generator"
+  ],
+  "node_count": 93,
+  "derivation_count": 22,
+  "narrative_count": 12,
+  "tags": [
+    "optimization",
+    "convex analysis",
+    "numerical methods",
+    "machine learning theory"
+  ],
+  "sections": {
+    "foundations": [1, 20],
+    "optimality": [21, 32],
+    "duality": [23, 32],
+    "gradient_methods": [33, 42],
+    "newton_quasi_newton": [43, 54],
+    "constrained_optimization": [55, 64],
+    "convex_optimization": [65, 73],
+    "lp_qp_sdp": [74, 83],
+    "nonsmooth": [84, 88],
+    "applications": [89, 93]
+  },
+  "directories": {
+    "nodes": "nodes/",
+    "derivations": "derivations/",
+    "narrative": "narrative/",
+    "relationships": "relationships/"
+  }
+}
