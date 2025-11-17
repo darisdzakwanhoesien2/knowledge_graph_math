@@ -1,33 +1,66 @@
 import os
 import json
 
-# Define the base directory for subjects
-BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../subjects'))
+# Base directory for all subjects
+BASE = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../subjects")
+)
 
+# =========================================================
+# SUBJECT LIST
+# =========================================================
 def list_subjects():
-    # Check if the BASE directory exists
     if not os.path.exists(BASE):
-        raise FileNotFoundError(f"The subjects directory does not exist: {BASE}")
+        raise FileNotFoundError(f"Subjects directory not found: {BASE}")
 
-    # List directories inside the BASE directory
-    return [d for d in os.listdir(BASE) if os.path.isdir(os.path.join(BASE, d))]
+    return [
+        d for d in os.listdir(BASE)
+        if os.path.isdir(os.path.join(BASE, d))
+    ]
 
 
+# =========================================================
+# LOADERS FOR SUBJECT COMPONENTS
+# =========================================================
 def load_subject_nodes(subject):
     folder = os.path.join(BASE, subject, "nodes")
-    return {f[:-3]: os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".md")}
+    if not os.path.isdir(folder):
+        return {}
+
+    return {
+        f[:-3]: os.path.join(folder, f)
+        for f in os.listdir(folder)
+        if f.endswith(".md")
+    }
 
 
 def load_subject_derivations(subject):
     folder = os.path.join(BASE, subject, "derivations")
-    return {f[:-3]: os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".md")}
+    if not os.path.isdir(folder):
+        return {}
+
+    return {
+        f[:-3]: os.path.join(folder, f)
+        for f in os.listdir(folder)
+        if f.endswith(".md")
+    }
 
 
 def load_subject_narratives(subject):
     folder = os.path.join(BASE, subject, "narrative")
-    return {f[:-3]: os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".md")}
+    if not os.path.isdir(folder):
+        return {}
+
+    return {
+        f[:-3]: os.path.join(folder, f)
+        for f in os.listdir(folder)
+        if f.endswith(".md")
+    }
 
 
+# =========================================================
+# GLOBAL NODE SEARCH
+# =========================================================
 def load_all_nodes(search=""):
     results = []
     for subject in list_subjects():
@@ -35,37 +68,35 @@ def load_all_nodes(search=""):
         for name, path in nodes.items():
             if search.lower() in name.lower():
                 results.append((subject, name, path))
+
     return results
 
 
+# =========================================================
+# RELATIONSHIPS LOADER (subject-level KG)
+# =========================================================
 def load_relationships(subject):
-    # Construct the file path dynamically
-    relationships_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../subjects', subject, 'relationships'))
-    file = os.path.join(relationships_dir, 'matrix_edges.json')  # Correct file name
+    relationships_dir = os.path.join(BASE, subject, "relationships")
+    json_path = os.path.join(relationships_dir, "matrix_edges.json")
 
-    # Check if the file exists
-    if not os.path.exists(file):
-        raise FileNotFoundError(f"File not found: {file}")
+    if not os.path.exists(json_path):
+        raise FileNotFoundError(f"Relationship file not found: {json_path}")
 
-    # Load the relationships from the file
-    with open(file, "r") as f:
-        edges = json.load(f)
+    with open(json_path, "r") as f:
+        return json.load(f)
 
-    return edges
 
+# =========================================================
+# Utility: find subject folder for given node name
+# =========================================================
 def get_node_subject(node_name):
-    """
-    Given a node name, return the subject directory it belongs to.
-    """
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../subjects"))
-
-    for subject in os.listdir(base_dir):
-        subject_path = os.path.join(base_dir, subject, "nodes")
-        if not os.path.exists(subject_path):
+    for subject in list_subjects():
+        node_dir = os.path.join(BASE, subject, "nodes")
+        if not os.path.isdir(node_dir):
             continue
 
-        for f in os.listdir(subject_path):
-            if f.replace(".md", "") == node_name:
+        for f in os.listdir(node_dir):
+            if f.endswith(".md") and f[:-3] == node_name:
                 return subject
 
     return None
