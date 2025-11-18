@@ -1,43 +1,445 @@
 [
-  { "source": "Vector_Norms", "target": "Matrix_Norms", "relation": "induces" },
-  { "source": "Vector_Norms", "target": "Conditioning", "relation": "used_in" },
-  { "source": "Vector_Norms", "target": "Stability", "relation": "affects" },
+  { "source": "Power_Method", "target": "Dominant_Eigenvalue", "relation": "computes" },
+  { "source": "Power_Method", "target": "Rayleigh_Quotient_Iteration", "relation": "extended_by" },
+  { "source": "Inverse_Iteration", "target": "Eigenvalue_Near_Shift", "relation": "targets" },
+  { "source": "Rayleigh_Quotient_Iteration", "target": "Cubic_Convergence", "relation": "achieves_for_Hermitian" },
+  { "source": "Rayleigh_Quotient_Iteration", "target": "Linear_System_Solve", "relation": "requires_per_iteration" },
 
-  { "source": "Matrix_Norms", "target": "Conditioning", "relation": "defines" },
-  { "source": "Matrix_Norms", "target": "Stability", "relation": "influences" },
-  { "source": "Matrix_Norms", "target": "Matrix_Exponential", "relation": "used_in" },
+  { "source": "Arnoldi_Method", "target": "Krylov_Subspace", "relation": "builds" },
+  { "source": "Arnoldi_Method", "target": "Ritz_Values", "relation": "produces" },
+  { "source": "Arnoldi_Method", "target": "Hessenberg_Reduction", "relation": "generalizes" },
+  { "source": "Lanczos_Method", "target": "Arnoldi_Method", "relation": "special_case_for_Hermitian" },
+  { "source": "Krylov_Subspace", "target": "GMRES", "relation": "used_in" },
+  { "source": "Krylov_Subspace", "target": "Arnoldi_Method", "relation": "core_of" },
 
-  { "source": "Floating_Point_Arithmetic", "target": "Backward_Error", "relation": "causes" },
-  { "source": "Backward_Error", "target": "Forward_Error", "relation": "bounds" },
-  { "source": "Conditioning", "target": "Forward_Error", "relation": "amplifies" },
+  { "source": "Shift_and_Invert", "target": "Interior_Eigenvalues", "relation": "targets" },
+  { "source": "Shift_and_Invert", "target": "Preconditioned_Eigensolver", "relation": "often_combined_with" },
 
-  { "source": "Matrix_Norms", "target": "LU_Factorization", "relation": "analyzes" },
-  { "source": "LU_Factorization", "target": "Gaussian_Elimination", "relation": "implements" },
-  { "source": "LU_Factorization", "target": "Pivoting", "relation": "requires" },
+  { "source": "Rayleigh_Quotient", "target": "Eigenvalue_Estimate", "relation": "provides" },
+  { "source": "Ritz_Values", "target": "Eigenvalue_Approximation", "relation": "are" },
+  { "source": "Residual_Norm", "target": "Convergence_Test", "relation": "used_for" },
 
-  { "source": "Cholesky_Factorization", "target": "Positive_Definite_Matrices", "relation": "requires" },
-  { "source": "Cholesky_Factorization", "target": "Triangular_Systems", "relation": "produces" },
+  { "source": "Restarting", "target": "Arnoldi_Method", "relation": "necessary_for_large_n" },
+  { "source": "Implicit_Restart", "target": "Arnoldi_Method", "relation": "improves" },
+  { "source": "Deflation", "target": "Converged_Eigenvectors", "relation": "removes" },
 
-  { "source": "QR_Factorization", "target": "Least_Squares", "relation": "solves" },
-  { "source": "QR_Factorization", "target": "SVD", "relation": "related_to" },
+  { "source": "Block_Arnoldi", "target": "Multiple_Eigenvalues", "relation": "handles" },
+  { "source": "Harmonic_Ritz", "target": "Interior_Eigenvalues", "relation": "better_for" },
 
-  { "source": "SVD", "target": "Low_Rank_Approximations", "relation": "enables" },
-  { "source": "SVD", "target": "PCA_Numerical", "relation": "underpins" },
-  { "source": "SVD", "target": "Matrix_Exponential", "relation": "diagonalizes" },
+  { "source": "Jacobi_Davidson", "target": "Interior_Eigenvalues", "relation": "efficient_for" },
+  { "source": "Jacobi_Davidson", "target": "Correction_Equation", "relation": "solves" },
 
-  { "source": "Eigenvalue_Decomposition", "target": "Power_Iteration", "relation": "approximated_by" },
-  { "source": "Power_Iteration", "target": "Rayleigh_Quotient_Iteration", "relation": "generalized_by" },
-  { "source": "Arnoldi_Iteration", "target": "Krylov_Subspace_Methods", "relation": "is_instance_of" },
-  { "source": "Lanczos_Method", "target": "Arnoldi_Iteration", "relation": "special_case_for_SPD" },
+  { "source": "Subspace_Iteration", "target": "Several_Largest_Eigenvalues", "relation": "computes" },
+  { "source": "LOBPCG", "target": "Symmetric_Positive_Definite", "relation": "state_of_the_art_for" },
 
-  { "source": "Matrix_Exponential", "target": "Matrix_Logarithm", "relation": "inverse_of" },
-  { "source": "Matrix_Exponential", "target": "Numerical_Solution_of_ODEs", "relation": "used_in" },
+  { "source": "Preconditioning_Eigensolver", "target": "Shift_and_Invert", "relation": "requires_good" },
+  { "source": "Preconditioning_Eigensolver", "target": "AMG", "relation": "often_uses" },
+  { "source": "Preconditioning_Eigensolver", "target": "ILU", "relation": "often_uses" },
 
-  { "source": "Gershgorin_Theorem", "target": "Eigenvalue_Decomposition", "relation": "bounds" },
-  { "source": "Interlacing_Theorem", "target": "SVD", "relation": "related_to" },
+  { "source": "Polynomial_Filter", "target": "Unwanted_Eigenvalues", "relation": "suppresses" },
+  { "source": "Chebyshev_Filter", "target": "Largest_Eigenvalues", "relation": "amplifies" },
 
-  { "source": "Conditioning", "target": "Jacobi_Method", "relation": "affects_convergence" },
-  { "source": "Conditioning", "target": "Gauss_Seidel_Method", "relation": "affects_convergence" },
+  { "source": "Spectrum_Slicing", "target": "Eigenvalues_in_Interval", "relation": "finds" },
+  { "source": "Spectrum_Slicing", "target": "Inertia_Counting", "relation": "uses" },
 
-  { "source": "Graph_Laplacian_Eigenvalues", "target": "Power_Iteration", "relation": "computed_with" }
+  { "source": "Nonlinear_Eigenproblem", "target": "Inverse_Iteration", "relation": "generalized_with" },
+  { "source": "Rational_Filter", "target": "NEP", "relation": "used_in" },
+  
+  { "source": "Eigenvalue_Problem", "target": "Spectrum", "relation": "defines" },
+  { "source": "Spectrum", "target": "Gershgorin_Disks", "relation": "bounded_by" },
+  { "source": "Gershgorin_Disks", "target": "Localization", "relation": "provides" },
+
+  { "source": "Field_of_Values", "target": "Spectrum", "relation": "contains" },
+  { "source": "Field_of_Values", "target": "Rayleigh_Quotient", "relation": "evaluated_at" },
+
+  { "source": "Power_Method", "target": "Dominant_Eigenpair", "relation": "computes" },
+  { "source": "Inverse_Iteration", "target": "Eigenpair_Near_Shift", "relation": "targets" },
+  { "source": "Rayleigh_Quotient_Iteration", "target": "Fast_Local_Convergence", "relation": "achieves" },
+  { "source": "Rayleigh_Quotient_Iteration", "target": "Shift_Update", "relation": "uses_dynamic" },
+
+  { "source": "Householder_Reflections", "target": "Hessenberg_Reduction", "relation": "used_for" },
+  { "source": "Hessenberg_Reduction", "target": "QR_Iteration", "relation": "prepares_for" },
+  { "source": "QR_Iteration", "target": "Schur_Form", "relation": "converges_to" },
+  { "source": "Implicit_Shifts", "target": "QR_Iteration", "relation": "accelerates" },
+
+  { "source": "Generalized_Eigenproblem", "target": "QZ_Algorithm", "relation": "solved_by" },
+  { "source": "QZ_Algorithm", "target": "Triangular_Pair", "relation": "produces" },
+
+  { "source": "Eigenvalue_Sensitivity", "target": "Condition_Number_of_Eigenvectors", "relation": "depends_on" },
+  { "source": "Bauer_Fike_Theorem", "target": "Perturbation_Bounds", "relation": "provides" },
+
+  { "source": "Characteristic_Polynomial", "target": "Cayley_Hamilton", "relation": "annihilated_by" },
+  { "source": "Cayley_Hamilton", "target": "Matrix_Polynomials", "relation": "enables_evaluation" },
+
+  { "source": "Matrix_Functions", "target": "Spectral_Mapping", "relation": "preserves" },
+  { "source": "Spectral_Decomposition", "target": "Matrix_Functions", "relation": "diagonalizes" },
+  { "source": "Matrix_Exponential", "target": "Scaling_and_Squaring", "relation": "computed_with" },
+  { "source": "Matrix_Exponential", "target": "Pade_Approximants", "relation": "computed_with" },
+
+  { "source": "Square_Root_Iteration", "target": "Matrix_Square_Root", "relation": "computes" },
+  { "source": "Cayley_Transform", "target": "Unitary_from_SkewHermitian", "relation": "maps" },
+
+  { "source": "Functions_of_Matrices", "target": "Krylov_Methods", "relation": "approximated_with" },
+  { "source": "Lanczos_for_Expm", "target": "Matrix_Exponential", "relation": "efficient_for_sparse" },
+
+  { "source": "Trace", "target": "Sum_of_Eigenvalues", "relation": "equals" },
+  { "source": "Determinant", "target": "Product_of_Eigenvalues", "relation": "equals" },
+
+  
+  { "source": "Preconditioning", "target": "Iterative_Methods", "relation": "accelerates" },
+  { "source": "Preconditioning", "target": "Condition_Number_of_MA", "relation": "improves" },
+  { "source": "Preconditioning", "target": "Spectral_Properties", "relation": "clusters" },
+
+  { "source": "Left_Preconditioning", "target": "MAx = Mb", "relation": "transforms_to" },
+  { "source": "Right_Preconditioning", "target": "AMy = b", "relation": "transforms_to" },
+
+  { "source": "Splitting", "target": "Classical_Iterative_Methods", "relation": "defines" },
+  { "source": "Jacobi_Method", "target": "Diagonal_Preconditioner", "relation": "uses" },
+  { "source": "Gauss_Seidel", "target": "Lower_Triangular_Preconditioner", "relation": "uses" },
+  { "source": "SOR", "target": "Relaxation_Parameter", "relation": "introduces" },
+
+  { "source": "Incomplete_LU", "target": "Drop_Fill_In", "relation": "allows" },
+  { "source": "ILU0", "target": "Same_Sparsity_as_A", "relation": "keeps" },
+  { "source": "ILUT", "target": "Threshold_and_Level", "relation": "controls_fill_with" },
+  { "source": "Incomplete_Cholesky", "target": "Symmetric_Positive_Definite", "relation": "for" },
+
+  { "source": "Sparse_Approximate_Inverse", "target": "Frobenius_Norm_Minimization", "relation": "computes_via" },
+  { "source": "SPAI", "target": "Independent_Least_Squares_per_Row", "relation": "solves" },
+  { "source": "FSAI", "target": "Factorized_Sparse_Approximate_Inverse", "relation": "variant" },
+
+  { "source": "Algebraic_Multigrid", "target": "PDE_Discretizations", "relation": "optimal_for" },
+  { "source": "AMG", "target": "Coarsening", "relation": "builds_hierarchy_with" },
+  { "source": "AMG", "target": "Smoothers", "relation": "uses_Jacobi_or_GS" },
+
+  { "source": "Domain_Decomposition", "target": "Overlapping_Subdomains", "relation": "splits_into" },
+  { "source": "Schwarz_Method", "target": "Additive_or_Multiplicative", "relation": "variant" },
+
+  { "source": "Preconditioner_Choice", "target": "Problem_Origin", "relation": "depends_on" },
+  { "source": "Preconditioner_Choice", "target": "Symmetry", "relation": "depends_on" },
+  { "source": "Preconditioner_Choice", "target": "Parallelism", "relation": "depends_on" },
+
+  { "source": "Growth_Factor", "target": "Backward_Stability", "relation": "influences" },
+  { "source": "Partial_Pivoting", "target": "Growth_Factor_Control", "relation": "provides_in_practice" },
+
+  { "source": "Condition_Number", "target": "Error_Amplification", "relation": "measures" },
+  { "source": "Backward_Error", "target": "Forward_Error", "relation": "bounded_by_conditioning" },
+  { "source": "Large_Linear_Systems", "target": "Iterative_Methods", "relation": "solved_by" },
+  { "source": "Iterative_Methods", "target": "Matrix_Vector_Products", "relation": "rely_on" },
+  { "source": "Matrix_Vector_Products", "target": "Sparse_Matrices", "relation": "cheap_for" },
+  { "source": "Iterative_Methods", "target": "Residual_Norm", "relation": "monitor" },
+
+  { "source": "Krylov_Subspace", "target": "GMRES", "relation": "core_of" },
+  { "source": "Krylov_Subspace", "target": "Arnoldi_Process", "relation": "generated_by" },
+  { "source": "Arnoldi_Process", "target": "Hessenberg_Matrix", "relation": "produces" },
+  { "source": "GMRES", "target": "Least_Squares_Problem", "relation": "solves_small" },
+  { "source": "GMRES", "target": "Long_Recurrence", "relation": "requires" },
+  { "source": "GMRES_Restart", "target": "Memory_Limit", "relation": "addresses" },
+
+  { "source": "Conjugate_Gradient", "target": "Hermitian_Positive_Definite", "relation": "optimal_for" },
+  { "source": "Conjugate_Gradient", "target": "A_Norm_Error", "relation": "minimizes" },
+  { "source": "Conjugate_Gradient", "target": "Short_Recurrence", "relation": "uses" },
+  { "source": "Conjugate_Gradient", "target": "Lanczos_Algorithm", "relation": "equivalent_to" },
+
+  { "source": "Lanczos_Method", "target": "Symmetric_Matrices", "relation": "applies_to" },
+  { "source": "Lanczos_Method", "target": "Tridiagonal_Matrix", "relation": "produces" },
+
+  { "source": "MINRES", "target": "Symmetric_Indefinite", "relation": "for" },
+  { "source": "BiCGSTAB", "target": "Non_Hermitian", "relation": "popular_for" },
+  { "source": "BiCGSTAB", "target": "Short_Recurrence", "relation": "uses" },
+  { "source": "BiCGSTAB", "target": "Possible_Breakdown", "relation": "risk_of" },
+
+  { "source": "Normal_Equations", "target": "Least_Squares", "relation": "transforms_to" },
+  { "source": "Normal_Equations", "target": "Condition_Number_Squared", "relation": "has" },
+
+  { "source": "Convergence_Rate", "target": "Spectrum_Clustering", "relation": "improved_by" },
+  { "source": "Polynomial_Approximation", "target": "Convergence_Analysis", "relation": "used_in" },
+  { "source": "Eigenvalue_Distribution", "target": "Convergence_Speed", "relation": "determines" },
+
+  { "source": "Preconditioning", "target": "Effective_Spectrum", "relation": "creates" },
+  { "source": "Preconditioning", "target": "Iterative_Methods", "relation": "essential_for_fast" },
+
+  { "source": "Large_Scale_Problems", "target": "Storage_O(n)", "relation": "requires" },
+  { "source": "Direct_Methods", "target": "O(n^3)_Complexity", "relation": "prohibited_by" },
+  { "source": "Iterative_Methods", "target": "O(n)_per_Iteration", "relation": "aim_for" },
+
+  { "source": "Positive_Definite_Matrix", "target": "Cholesky_Factorization", "relation": "enables" },
+  { "source": "Cholesky_Factorization", "target": "R R^* Decomposition", "relation": "computes" },
+  { "source": "Cholesky_Factorization", "target": "Half_Storage", "relation": "requires_only" },
+  { "source": "Cholesky_Factorization", "target": "1/3 n^3 Flops", "relation": "costs" },
+  { "source": "Block_Cholesky", "target": "Schur_Complement", "relation": "uses_recursive" },
+
+  { "source": "Sylvester_Equation", "target": "AX - XB = C", "relation": "solves" },
+  { "source": "Sylvester_Equation", "target": "Disjoint_Spectra", "relation": "unique_solution_if" },
+  { "source": "Sylvester_Equation", "target": "Kronecker_Form", "relation": "vectorized_to" },
+  { "source": "Sylvester_Equation", "target": "O(n^3) Complexity", "relation": "naive_cost" },
+
+  { "source": "Circulant_Matrix", "target": "Fourier_Matrix", "relation": "diagonalized_by" },
+  { "source": "Fourier_Matrix", "target": "FFT", "relation": "computed_with" },
+  { "source": "FFT", "target": "O(n log n) Matvec", "relation": "achieves" },
+  { "source": "Circulant_Matrix", "target": "Polynomial_Roots", "relation": "eigenvalues_are" },
+
+  { "source": "Toeplitz_Matrix", "target": "Circulant_Embedding", "relation": "fast_matvec_via" },
+  { "source": "Toeplitz_Matrix", "target": "Levinson_Algorithm", "relation": "solved_with" },
+
+  { "source": "Structure_Exploitation", "target": "Complexity_Reduction", "relation": "leads_to" },
+  { "source": "Structure_Exploitation", "target": "Storage_Reduction", "relation": "leads_to" },
+  { "source": "Dense_Methods", "target": "O(n^3)", "relation": "worst_case" },
+
+  { "source": "Positive_Definite", "target": "Energy_Minimization", "relation": "arises_in" },
+  { "source": "Sylvester_Equation", "target": "Control_Theory", "relation": "used_in" },
+  { "source": "FFT", "target": "Signal_Processing", "relation": "fundamental_in" },
+
+  { "source": "Cholesky_vs_LU", "target": "No_Pivoting_Needed", "relation": "advantage" },
+  { "source": "Cholesky_vs_LU", "target": "Twice_as_Fast", "relation": "roughly" },
+
+  { "source": "Fast_Transform", "target": "Convolution", "relation": "accelerates" },
+  { "source": "Circulant_Preconditioner", "target": "Iterative_Methods", "relation": "used_as" },
+
+
+  { "source": "Condition_Number", "target": "Numerical_Stability", "relation": "measures_risk_in" },
+  { "source": "Condition_Number", "target": "Forward_Error", "relation": "bounds" },
+  { "source": "Condition_Number", "target": "SVD_Computation", "relation": "obtained_from" },
+
+  { "source": "Gaussian_Elimination", "target": "LU_Factorization", "relation": "computes" },
+  { "source": "LU_Factorization", "target": "Triangular_Solves", "relation": "followed_by" },
+  { "source": "LU_Factorization", "target": "2/3 n^3 Flops", "relation": "costs" },
+
+  { "source": "Partial_Pivoting", "target": "Row_Permutation", "relation": "chooses" },
+  { "source": "Partial_Pivoting", "target": "Pivot_Growth_Control", "relation": "provides_in_practice" },
+  { "source": "Partial_Pivoting", "target": "Backward_Stability", "relation": "ensures" },
+  { "source": "Partial_Pivoting", "target": "PA = LU", "relation": "produces" },
+
+  { "source": "Gauss_Transform", "target": "Lower_Triangular", "relation": "is" },
+  { "source": "Gauss_Transform", "target": "L_j = I + l_j e_j^*", "relation": "form" },
+  { "source": "Gauss_Transform", "target": "Inverse_Explicit", "relation": "has" },
+
+  { "source": "Permutation_Matrix", "target": "Unitary", "relation": "is" },
+  { "source": "Permutation_Matrix", "target": "P^{-1} = P^T", "relation": "satisfies" },
+
+  { "source": "Growth_Factor", "target": "Theoretical_Worst_Case", "relation": "can_be_exponential" },
+  { "source": "Growth_Factor", "target": "Practical_Behavior", "relation": "usually_small" },
+  { "source": "Growth_Factor", "target": "Backward_Error", "relation": "influences" },
+
+  { "source": "Complete_Pivoting", "target": "PAQ = LU", "relation": "computes" },
+  { "source": "Complete_Pivoting", "target": "Better_Growth_Control", "relation": "provides" },
+  { "source": "Complete_Pivoting", "target": "Higher_Cost", "relation": "has" },
+
+  { "source": "Floating_Point_Arithmetic", "target": "Unit_Roundoff", "relation": "defines" },
+  { "source": "Floating_Point_Arithmetic", "target": "Backward_Stability", "relation": "analyzed_with" },
+
+  { "source": "Max_Norm", "target": "L_Factor_Bound", "relation": "||L||_∞ ≤ n" },
+  { "source": "1_Norm", "target": "L_Factor_Bound", "relation": "||L||_1 ≤ n" },
+
+  { "source": "Pivoting_Strategy", "target": "Numerical_Stability", "relation": "critical_for" },
+  { "source": "Pivoting_Strategy", "target": "Catastrophic_Cancellation", "relation": "prevents" },
+
+  { "source": "Direct_Methods", "target": "Exact_Arithmetic", "relation": "assume" },
+  { "source": "Finite_Precision", "target": "Perturbation_Analysis", "relation": "requires" },
+
+
+  { "source": "Matrix_Subspaces", "target": "Factoring_Framework", "relation": "provides_general" },
+  { "source": "Matrix_Subspaces", "target": "LU_Factorization", "relation": "generalizes" },
+  { "source": "Matrix_Subspaces", "target": "SVD", "relation": "includes_low_rank" },
+
+  { "source": "Product_of_Subspaces", "target": "V1_V2", "relation": "defines" },
+  { "source": "Product_of_Subspaces", "target": "Approximate_Factoring", "relation": "allows" },
+  { "source": "Product_of_Subspaces", "target": "Rank_k_Matrices", "relation": "represents_F_k" },
+
+  { "source": "Invertible_Subspace", "target": "Inverse_Subspace", "relation": "has_as" },
+  { "source": "Invertible_Subspace", "target": "Lower_Triangular", "relation": "example" },
+  { "source": "Invertible_Subspace", "target": "Upper_Triangular", "relation": "inverse_of_lower" },
+
+  { "source": "Orthogonal_Projector", "target": "Range", "relation": "projects_onto" },
+  { "source": "Orthogonal_Projector", "target": "Gram_Schmidt", "relation": "constructed_with" },
+  { "source": "Orthogonal_Projector", "target": "Hermitian_Part", "relation": "example_1/2(A+A^*)" },
+
+  { "source": "Factoring_Algorithm", "target": "Project_and_Solve", "relation": "alternates" },
+  { "source": "Factoring_Algorithm", "target": "Linear_Least_Squares", "relation": "reduces_to" },
+  { "source": "Factoring_Algorithm", "target": "A_W_≈_V1", "relation": "solves_for_W" },
+
+  { "source": "Conditioning_in_Factoring", "target": "kappa(W)", "relation": "error_bound_by" },
+  { "source": "Conditioning_in_Factoring", "target": "Ill_Conditioned_W", "relation": "causes_large_error" },
+  { "source": "Conditioning_in_Factoring", "target": "Near_Singular_A", "relation": "example" },
+
+  { "source": "LU_with_Partial_Pivoting", "target": "Factoring_Framework", "relation": "special_case_of" },
+  { "source": "Lower_Triangular_Subspace", "target": "Upper_Triangular_Subspace", "relation": "product_gives_nonsingular" },
+
+  { "source": "Krylov_Matrix_Subspace", "target": "Polynomial_Invariant", "relation": "is" },
+  { "source": "Similarity_Invariant", "target": "Eigenvalues", "relation": "preserves" },
+
+  { "source": "Standard_Subspace", "target": "Sparsity_Pattern", "relation": "corresponds_to" },
+  { "source": "Standard_Subspace", "target": "Diagonal_Projector", "relation": "keeps_diagonal" },
+
+  { "source": "Nonsingular_Elements", "target": "Open_Dense", "relation": "are_in_subspace" },
+  { "source": "Nonsingular_Elements", "target": "Singular_Set_Closed", "relation": "complement_is" },
+
+  { "source": "Projection_Method", "target": "Dimension_Reduction", "relation": "achieves" },
+  { "source": "Projection_Method", "target": "Orthogonal_vs_Oblique", "relation": "prefers" },
+  { "source": "Matrix_Subspaces", "target": "Similarity_Invariant", "relation": "can_be" },
+  { "source": "Matrix_Subspaces", "target": "Polynomial_Invariant", "relation": "can_be" },
+  { "source": "Matrix_Subspaces", "target": "Invertible_Subspace", "relation": "can_be" },
+
+  { "source": "Similarity_Invariant", "target": "Eigenvalues_Preserved", "relation": "ensures" },
+  { "source": "Similarity_Invariant", "target": "Jordan_Structure", "relation": "preserves" },
+
+
+
+  { "source": "Polynomial_Invariant", "target": "Krylov_Subspace", "relation": "example" },
+  { "source": "Krylov_Subspace", "target": "Power_Method", "relation": "generated_by" },
+  { "source": "Krylov_Subspace", "target": "Arnoldi_Method", "relation": "core_of" },
+
+  { "source": "Invertible_Subspace", "target": "Inverse_in_Subspace", "relation": "closure_contains" },
+  { "source": "Invertible_Subspace", "target": "Lower_Triangular", "relation": "example" },
+  { "source": "Lower_Triangular", "target": "Upper_Triangular", "relation": "inverse_is" },
+
+  { "source": "Rank_One_Update", "target": "I + uv^*", "relation": "form" },
+  { "source": "Rank_One_Update", "target": "Sherman_Morrison", "relation": "invertible_via" },
+  { "source": "Rank_One_Update", "target": "Krylov_Methods", "relation": "used_in" },
+
+  { "source": "Shifted_Matrix", "target": "A - αI", "relation": "form" },
+  { "source": "Shifted_Matrix", "target": "Low_Rank_Approximation", "relation": "often_plus" },
+
+  { "source": "Linear_Pencil", "target": "span{I, A}", "relation": "for_standard_eigenproblem" },
+  { "source": "Linear_Pencil", "target": "span{A, B}", "relation": "for_generalized" },
+
+  { "source": "Outer_Product_Form", "target": "∑ u_j v_j^*", "relation": "represents_low_rank" },
+  { "source": "Outer_Product_Form", "target": "Compression", "relation": "enables" },
+
+  { "source": "Transpose_Subspace", "target": "V^T", "relation": "defined_as" },
+  { "source": "Invariant_Subspace", "target": "A S ⊂ S", "relation": "satisfies" },
+  { "source": "Projection_onto_Invariant", "target": "A P = P A", "relation": "iff" },
+
+  { "source": "Minimal_Polynomial", "target": "Annihilating_Polynomial", "relation": "lowest_degree" },
+  { "source": "Cayley_Hamilton", "target": "Characteristic_Polynomial", "relation": "annihilates" },
+
+  { "source": "Algebra_Subspace", "target": "Closed_under_Multiplication", "relation": "requires" },
+  { "source": "Algebra_Subspace", "target": "Polynomial_Invariant", "relation": "implies" },
+
+  { "source": "Nonsingular_Elements", "target": "Open_Dense_Set", "relation": "form" },
+  { "source": "Singular_Set", "target": "Closed_Variety", "relation": "is" },
+
+  
+  { "source": "Singular_Value_Decomposition", "target": "Low_Rank_Approximation", "relation": "solves_best" },
+  { "source": "Singular_Value_Decomposition", "target": "Eckart_Young_Theorem", "relation": "proven_by" },
+  { "source": "Singular_Value_Decomposition", "target": "Operator_Norm", "relation": "σ1_equals" },
+  { "source": "Singular_Value_Decomposition", "target": "Frobenius_Norm", "relation": "√(σ1²+...+σn²)" },
+
+  { "source": "Unitary_Matrices", "target": "Preserve_Norm", "relation": "Q^*Q=I_implies" },
+  { "source": "Unitary_Matrices", "target": "QR_Factorization", "relation": "Q_part_of" },
+  { "source": "Unitary_Matrices", "target": "Schur_Form", "relation": "similarity_with" },
+
+  { "source": "Singular_Values", "target": "Unique_and_Ordered", "relation": "are" },
+  { "source": "Singular_Values", "target": "Min_Max_Characterization", "relation": "have" },
+  { "source": "Singular_Values", "target": "Interlacing", "relation": "satisfy" },
+
+  { "source": "Low_Rank_Approximation", "target": "Data_Compression", "relation": "enables" },
+  { "source": "Low_Rank_Approximation", "target": "Truncation_of_SVD", "relation": "achieved_by" },
+  { "source": "Low_Rank_Approximation", "target": "Rank_k_Matrices", "relation": "best_in_F_k" },
+
+  { "source": "Outer_Product_Form", "target": "∑ σ_j u_j v_j^*", "relation": "dyadic_expansion" },
+  { "source": "Outer_Product_Form", "target": "Efficient_Storage", "relation": "2nk_parameters" },
+
+  { "source": "Unitarily_Invariant_Norms", "target": "SVD_Solves_Minimization", "relation": "for_all" },
+  { "source": "Frobenius_Norm", "target": "Easy_Computation", "relation": "√∑|a_jk|²" },
+  { "source": "Operator_Norm", "target": "Hard_Computation", "relationrelation": "requires_σ1" },
+
+  { "source": "Hermitian_Eigenproblem", "target": "Unitary_Diagonalization", "relation": "A=UΛU^*" },
+  { "source": "A^*A", "target": "Positive_Semidefinite", "relation": "eigenvalues_σ²" },
+
+  { "source": "Data_Compression", "target": "Truncated_SVD", "relation": "uses" },
+  { "source": "Principal_Component_Analysis", "target": "Mean_Centered_SVD", "relation": "is" },
+  { "source": "Mean_Centering", "target": "A - e α^*", "relation": "removes_column_mean" },
+
+  { "source": "Rank_k_Matrices", "target": "F_k", "relation": "denoted" },
+  { "source": "Rank_k_Matrices", "target": "V1_V2_Product", "relation": "last_columns/rows_zero" },
+
+  { "source": "Theorem_1", "target": "min||A-F_k||=σ_{k+1}", "relation": "states" },
+  { "source": "Best_Approximation", "target": "∑_{j=1}^k σ_j u_j v_j^*", "relation": "is" },
+
+  { "source": "Proof_Outline", "target": "Unitarily_Invariant", "relation": "holds_for" },
+  { "source": "Proof_Outline", "target": "Subspace_Argument", "relation": "uses" },
+
+  { "source": "Matrix_Subspace", "target": "Linear_Structure", "relation": "is" },
+  { "source": "Matrix_Subspace", "target": "Sparsity_Pattern", "relation": "can_define" },
+  { "source": "Matrix_Subspace", "target": "Lower_Triangular", "relation": "example" },
+  { "source": "Matrix_Subspace", "target": "Upper_Triangular", "relation": "example" },
+  { "source": "Matrix_Subspace", "target": "Hermitian", "relation": "example_over_R" },
+  { "source": "Matrix_Subspace", "target": "Toeplitz", "relation": "example" },
+
+  { "source": "Product_of_Subspaces", "target": "V1_V2", "relation": "set_of" },
+  { "source": "Product_of_Subspaces", "target": "LU_Factorization", "relation": "core_of" },
+  { "source": "Product_of_Subspaces", "target": "Rank_k_Matrices", "relation": "represents_F_k" },
+  { "source": "Product_of_Subspaces", "target": "Approximate_Factoring", "relation": "enables" },
+
+  { "source": "Strongly_Nonsingular", "target": "LU_Without_Pivoting", "relation": "guarantees" },
+  { "source": "Strongly_Nonsingular", "target": "Nonzero_Principal_Minors", "relation": "defined_by" },
+
+  { "source": "Closure_of_Product", "target": "Full_Matrix_Space", "relation": "equals" },
+  { "source": "Closure_of_Product", "target": "Dense_in_C^{n×n}", "relation": "is" },
+
+  { "source": "Rank_k_Matrices", "target": "F_k", "relation": "denoted" },
+  { "source": "Rank_k_Matrices", "target": "Last_Columns_Zero", "relation": "V1_has" },
+  { "source": "Rank_k_Matrices", "target": "Last_Rows_Zero", "relation": "V2_has" },
+  { "source": "Rank_k_Matrices", "target": "Outer_Product_Form", "relation": "∑ u_j v_j^*" },
+
+  { "source": "Outer_Product_Form", "target": "Efficient_Storage", "relation": "2nk_parameters" },
+  { "source": "Outer_Product_Form", "target": "Matvec_Efficient", "relation": "yes" },
+
+  { "source": "Rank_One_Update", "target": "I + uv^*", "relation": "important_example" },
+  { "source": "Rank_One_Update", "target": "Easy_Inversion", "relation": "Sherman_Morrison" },
+
+  { "source": "Complex_Symmetric", "target": "M^T = M", "relation": "dimension_n(n+1)/2" },
+  { "source": "Hermitian", "target": "M^* = M", "relation": "dimension_n^2_over_R" },
+  { "source": "Toeplitz", "target": "Constant_Diagonals", "relation": "dimension_2n-1" },
+
+  { "source": "Subalgebra", "target": "Closed_under_Multiplication", "relation": "stronger_than_subspace" },
+  { "source": "Triangular_Matrices", "target": "Subalgebra", "relation": "are" },
+
+  { "source": "Nonsingular_Matrix", "target": "LU_Factorization", "relation": "has_if_strongly_regular" },
+  { "source": "Perturbation", "target": "LU_Exists", "relation": "arbitrarily_close_matrix_has" },
+
+  { "source": "SVD", "target": "Low_Rank_Approximation", "relation": "prepares_for" },
+  { "source": "SVD", "target": "Data_Compression", "relation": "used_in" },
+  { "source": "SVD", "target": "PCA", "relation": "core_of" },
+
+  
+  { "source": "Matrix_Computations", "target": "Numerical_Analysis_Core", "relation": "is_at_center_of" },
+  { "source": "Matrix_Computations", "target": "Scientific_Computing", "relation": "synonym_with" },
+  { "source": "Matrix_Computations", "target": "Large_Scale_Problems", "relation": "focuses_on" },
+
+  { "source": "LU_Factorization", "target": "O(n^3)_Complexity", "relation": "has" },
+  { "source": "LU_Factorization", "target": "O(n^2)_Storage", "relation": "requires" },
+  { "source": "LU_Factorization", "target": "Triangular_Solves", "relation": "reduces_to" },
+
+  { "source": "Sparse_Matrices", "target": "O(n)_Nonzeros", "relation": "typically_have" },
+  { "source": "Sparse_Matrices", "target": "PDE_Discretization", "relation": "arise_from" },
+  { "source": "Sparse_Matrices", "target": "O(n)_Storage", "relation": "enable" },
+
+  { "source": "Direct_Methods", "target": "O(n^3)", "relation": "cost" },
+  { "source": "Direct_Methods", "target": "Small_Problems", "relation": "suitable_for" },
+  { "source": "Iterative_Methods", "target": "Large_Problems", "relation": "required_for" },
+
+  { "source": "Condition_Number", "target": "Accuracy_Scaling", "relation": "appears_in" },
+  { "source": "Condition_Number", "target": "SVD", "relation": "σ1/σn_from" },
+
+  { "source": "Inner_Product", "target": "Euclidean_Geometry", "relation": "originates" },
+  { "source": "Inner_Product", "target": "Gram_Schmidt", "relation": "needed_in" },
+  { "source": "Inner_Product", "target": "Complex_Conjugate", "relation": "uses_y^*x" },
+
+  { "source": "PDE_Discretization", "target": "Sparse_Linear_Systems", "relation": "produces" },
+  { "source": "PDE_Discretization", "target": "Local_Operators", "relation": "differentiation_is" },
+
+  { "source": "Very_Large_Problems", "target": "Iterative_Only", "relation": "solvable_only_by" },
+  { "source": "Very_Large_Problems", "target": "Matrix_Vector_Products", "relation": "information_from" },
+
+  { "source": "Operator_Theory", "target": "Large_Scale_Assumptions", "relation": "closer_to" },
+  { "source": "Operator_Theory", "target": "No_Hermitian_Transpose", "relation": "may_lack" },
+
+  { "source": "Course_Goal", "target": "Classical_and_Modern", "relation": "combine" },
+  { "source": "Course_Goal", "target": "Algorithm_Development", "relation": "enable" },
+  { "source": "Course_Goal", "target": "Application_Confidence", "relation": "build" },
+
+  { "source": "Undergraduate_Linear_Algebra", "target": "Prerequisite", "relation": "assumed" },
+  { "source": "Gram_Schmidt", "target": "Known", "relation": "should_be" },
+  { "source": "Gaussian_Elimination", "target": "Known", "relation": "should_be" }
 ]
