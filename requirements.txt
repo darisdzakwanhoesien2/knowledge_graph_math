@@ -1,12 +1,9 @@
 streamlit
-# neo4j-graphrag==1.10.0
-# neo4j
 numpy>=2.1.0
 pandas>=2.1
 matplotlib
 networkx
 python-louvain
 pyvis
-# tenacity>=9.1.2,<10
 requests
 openai
