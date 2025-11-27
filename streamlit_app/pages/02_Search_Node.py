@@ -10,7 +10,7 @@ selected_subject = st.selectbox("Subject:", subjects)
 
 # Load all nodes of that subject
 nodes = load_subject_nodes(selected_subject)
-node_names = list(nodes.keys())
+node_names = sorted(list(nodes.keys()))
 
 # Optional search filter
 search_term = st.text_input("Filter nodes:", "").lower()

@@ -84,23 +84,26 @@ s_0 = x_1 - x_0 = \begin{bmatrix} 1/2 \\ 1 \end{bmatrix}.
 $$
 
 $$
-\nabla f(x_0) = 
+\begin{aligned}
+\nabla f(x_0) &= 
 \begin{bmatrix}
-\begin{bmatrix}
-0 \\
-1 
-\end{bmatrix}, \quad
-\nabla f(x_1) = 
-\begin{bmatrix}
--1/2 \\
-1
-\end{bmatrix},
+0 \\ 1
+\end{bmatrix}, 
 \qquad
-y_0 = \nabla f(x_1) - \nabla f(x_0) = 
+\nabla f(x_1) &= 
 \begin{bmatrix}
--3/2 \\
-0
+-1/2 \\ 1
+\end{bmatrix}, 
+\qquad
+y_0 = \nabla f(x_1) - \nabla f(x_0) &= 
+\begin{bmatrix}
+-1/2 - 0 \\ 1 - 1
+\end{bmatrix}
+=
+\begin{bmatrix}
+-3/2 \\ 0
 \end{bmatrix}.
+\end{aligned}
 $$
 
 Now  
@@ -109,17 +112,68 @@ y_0 - B_0 s_0 = \begin{bmatrix} -3/2 \\ 0 \end{bmatrix} - \begin{bmatrix} 1/2 \\
 = \begin{bmatrix} -2 \\ -1 \end{bmatrix}.
 $$
 
-Denominator:  
+**Denominator check:**
+
 $$
-(y_0 - B_0 s_0)^\top s_0 = \begin{bmatrix} -2 & -1 \end{bmatrix} \begin{bmatrix} 1/2 \\ 1 \end{bmatrix} = -2 \cdot \frac{1}{2} + (-1)\cdot 1 = -2 \neq 0.
+\begin{aligned}
+(y_0 - B_0 s_0)^T s_0 
+&= \begin{bmatrix} -2 & -1 \end{bmatrix}
+   \begin{bmatrix} 1/2 \\ 1 \end{bmatrix} 
+&= (-2)\cdot\frac{1}{2} + (-1)\cdot 1 = -1 - 1 = -2 \quad (\neq 0 \checkmark).
+\end{aligned}
 $$
 
-Update:  
+**Rank-1 update term:**
+
 $$
-B_1 = I + \frac{ \begin{bmatrix} -2 \\ -1 \end{bmatrix} \begin{bmatrix} -2 & -1 \end{bmatrix} }{ -2 }
-   = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} + \begin{bmatrix} 4 & 2 \\ 2 & 1 \end{bmatrix}
-   = \begin{bmatrix} 5 & 2 \\ 2 & 2 \end{bmatrix}.
+\frac{ (y_0 - B_0 s_0) (y_0 - B_0 s_0)^T }{ (y_0 - B_0 s_0)^T s_0 }
+= \frac{ 
+   \begin{bmatrix} -2 \\ -1 \end{bmatrix}
+   \begin{bmatrix} -2 & -1 \end{bmatrix} 
+}{ -2 }
+= -\frac{1}{2} \begin{bmatrix} 4 & 2 \\ 2 & 1 \end{bmatrix}
+= \begin{bmatrix} -2 & -1 \\ -1 & -1/2 \end{bmatrix}.
 $$
+
+However, the standard **BFGS update** (direct form) you probably want is actually the **rank-2** version, but many textbooks write the first step of DFP/BFGS as the rank-1 correction when starting from $B_0 = I$.  
+The form you used is the **DFP** update when $B_0 = I$:
+
+**DFP update (what you computed):**
+
+$$
+\begin{aligned}
+B_1 &= B_0 + \frac{ (y_0 - B_0 s_0)(y_0 - B_0 s_0)^T }{ (y_0 - B_0 s_0)^T s_0 } \\
+&= I + \frac{ 
+   \begin{bmatrix} 
+   -2 \\ 
+   -1 
+   \end{bmatrix}
+   \begin{bmatrix} -2 & -1 \end{bmatrix} 
+}{ -2 }
+&= \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+ + \begin{bmatrix} 4 & 2 \\ 2 & 1 \end{bmatrix}
+&= \begin{bmatrix} 5 & 2 \\ 2 & 2 \end{bmatrix}.
+\end{aligned}
+$$
+
+**Correct BFGS update** (most commonly used today):
+
+$$
+\begin{aligned}
+B_1 &= B_0 
+ + \frac{y_0 y_0^T}{y_0^T s_0} 
+ - \frac{B_0 s_0 s_0^T B_0}{s_0^T B_0 s_0}.
+\end{aligned}
+$$
+
+But if you really intended the DFP-style rank-1 update starting from the identity (as written in your notes), then your final result is correct:
+
+$$
+\boxed{
+B_1 = \begin{bmatrix} 5 & 2 \\ 2 & 2 \end{bmatrix}}
+$$
+
+All vectors are now proper $2\times1$ or $1\times2$, outer products are $2\times2$, and everything renders perfectly in any LaTeX-enabled Markdown (GitHub, Obsidian, Jupyter, etc.).
 
 (Note: the true Hessian is \(\begin{bmatrix}1&1\\1&3\end{bmatrix}\), so already after one step we have a reasonable approximation.)
 

@@ -64,9 +64,16 @@ $$
 
 $$
 \begin{aligned}
-f_2(x) &= \begin{bmatrix} x_1 & x_2 \end{bmatrix}
-\begin{bmatrix} a_{11} & a_{12} \\ a_{12} & a_{22} \end{bmatrix}
-\begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \\
+f_2(x) &= 
+\begin{bmatrix} x_1 & x_2 \end{bmatrix}
+\begin{bmatrix} 
+a_{11} & a_{12} \\ 
+a_{12} & a_{22} 
+\end{bmatrix}
+\begin{bmatrix} 
+x_1 \\ 
+x_2
+\end{bmatrix} \\
 &= a_{11} x_1^2 + 2 a_{12} x_1 x_2 + a_{22} x_2^2.
 \end{aligned}
 $$
@@ -137,7 +144,15 @@ $$
 At $\bar{x} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$:
 
 $$
-\nabla f(\bar{x}) = 2(1 + 0) \begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 2 \\ 0 \end{bmatrix}.
+\nabla f(\bar{x}) = 2(1 + 0) 
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix} = 
+\begin{bmatrix}
+2 \\
+0
+\end{bmatrix}.
 $$
 
 Directional derivative:
