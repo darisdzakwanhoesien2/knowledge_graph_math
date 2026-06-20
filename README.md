@@ -609,4 +609,258 @@ SOFTWARE.
 
 ---
 
+## 10. Scaling Guide
+
+This section outlines how to transition the **Knowledge Graph Math Hub** from a single-user local tool to a production-grade, highly available, and scalable public-facing platform.
+
+### 1. Current Bottlenecks
+Under load (e.g., 50+ concurrent users), the following components will degrade or fail first:
+* **I/O-Bound Filesystem Scans:** Functions like [`list_subjects`](file:///home/ubuntu/apps/fixing_repo/knowledge_graph_math/streamlit_app/utils/loaders.py#L12), [`load_subject_nodes`](file:///home/ubuntu/apps/fixing_repo/knowledge_graph_math/streamlit_app/utils/loaders.py#L25), and [`load_relationships`](file:///home/ubuntu/apps/fixing_repo/knowledge_graph_math/streamlit_app/utils/loaders.py#L78) query the local directory structure on every single user interaction. As the number of subjects and nodes increases, filesystem scans (`os.walk` and `os.listdir`) become a severe bottleneck.
+* **On-the-Fly PyVis Graph Generation:** The PyVis graph creation ([`build_subject_graph`](file:///home/ubuntu/apps/fixing_repo/knowledge_graph_math/streamlit_app/utils/graph_builder.py#L70) and [`build_global_graph`](file:///home/ubuntu/apps/fixing_repo/knowledge_graph_math/streamlit_app/utils/graph_builder.py#L120)) runs dynamically. It writes physical `.html` files (e.g., `numerical_matrix_analysis_graph.html`) directly into the active working directory. Under concurrent requests, this causes CPU spikes (calculating layouts), write amplification, and file lock/race conditions where one user's rendering overwrites another's.
+* **Streamlit Concurrency & Memory Model:** Streamlit starts a new thread per user session and keeps session state in memory. WebSocket connections are kept open continuously. A single Streamlit instance is bound by Python's Global Interpreter Lock (GIL) and will experience thread exhaustion and high RAM usage under moderate concurrent load.
+* **Import Architecture:** The codebase uses runtime `sys.path.append` paths, which makes deploying it as a standard package or in distributed serverless runtimes fragile.
+
+---
+
+### 2. Database Scaling
+Moving away from flat markdown/JSON files is necessary to support scaling.
+
+* **Database Migration Path:**
+  * **Phase 1 (Low Scale):** Package the parsed node, derivation, and edge files into a read-only SQLite database bundled directly inside the application container.
+  * **Phase 2 (Production Scale):** Migrate to **PostgreSQL**.
+    * A `nodes` table stores the parsed Markdown properties, LaTeX contents, and metadata.
+    * An `edges` table represents relationships, storing `source_node_id`, `target_node_id`, and `relation_type`.
+* **Indexing Strategy:**
+  * Create a **B-Tree Index** on foreign keys: `edges(source_node_id)` and `edges(target_node_id)` to speed up adjacent node discovery and subgraph queries.
+  * Create a **GIN (Generalized Inverted Index)** on node math content/descriptions to support fast full-text searching across all subjects.
+* **Caching:**
+  * Deploy a **Redis** cluster to cache expensive database queries and the results of graph-clustering runs (e.g., Louvain community detection).
+* **Sharding and Read Replicas:**
+  * Since the workload is 99% read-heavy (only updating when content creators publish new math subjects), database sharding is unnecessary. 
+  * Instead, implement **Read Replicas**. Route write traffic (publishing new subjects) to a primary master database, and load-balance read queries across multiple read replicas.
+
+---
+
+### 3. Backend Scaling
+To handle high traffic, separate the UI from backend data operations:
+
+* **FastAPI Decoupling:** Extract all graph queries and file parsing into a separate, stateless REST API built with **FastAPI**. The frontend will query this API instead of reading directly from storage.
+* **Horizontal vs. Vertical Scaling:**
+  * *Vertical:* Scaling up resources (CPU/RAM) only delays resource exhaustion because of Python's GIL.
+  * *Horizontal:* Containerize both the FastAPI backend and Streamlit UI using Docker. Run multiple container instances across an orchestrator.
+* **Load Balancing and Session Affinity:**
+  * Place an Application Load Balancer (ALB) or Nginx in front of the container instances.
+  * **Important:** Configure **Sticky Sessions (Session Affinity)** on the load balancer for the Streamlit containers. Streamlit relies on persistent WebSocket connections; without sticky sessions, user connections will drop and reset.
+* **Asynchronous Workers:**
+  * Offload graph generation from the synchronous HTTP request lifecycle. Use a task queue like **Celery** with Redis as a broker to generate graph layouts in the background when node files are modified.
+
+---
+
+### 4. Frontend Scaling
+* **CDN (Content Delivery Network) Integration:**
+  * Save pre-rendered graph visualizations to an object storage bucket (e.g., AWS S3 or GCP Cloud Storage) and serve them globally via a CDN (e.g., CloudFront, Cloud CDN). Frontends embed these graphs using standard iframes referencing the CDN URLs, bypassing app servers entirely.
+* **Lazy Loading:**
+  * Configure graph iframes to use `loading="lazy"` so that heavy WebGL/Vis.js canvases are only rendered when the user scrolls them into view.
+* **Client-Side Rendering (CSR):**
+  * Replace the PyVis backend rendering engine with client-side libraries like **Sigma.js**, **Cytoscape.js**, or **D3.js**.
+  * The server only sends raw, lightweight JSON lists of nodes/edges. The user's browser performs the canvas rendering and physics simulations, removing significant compute load from the servers.
+* **SSG (Static Site Generation):**
+  * For public-facing math repositories, use **Next.js** or **Astro** to statically build mathematical definition pages at deploy time. This provides sub-second load times and SEO-friendly rendering of complex LaTeX formulas.
+
+---
+
+### 5. Infrastructure Setup
+We recommend deploying the application on managed cloud services to automate scaling, security, and orchestration.
+
+| Component | AWS Recommendation | GCP Recommendation | Azure Recommendation |
+| :--- | :--- | :--- | :--- |
+| **Container Compute** | ECS (Fargate) | Cloud Run | Azure Container Apps |
+| **Relational Database** | RDS PostgreSQL | Cloud SQL for PostgreSQL | Azure Database for PostgreSQL |
+| **In-Memory Cache** | ElastiCache (Redis) | Cloud Memorystore | Azure Cache for Redis |
+| **Object Storage** | Amazon S3 | Google Cloud Storage | Azure Blob Storage |
+| **Global CDN** | Amazon CloudFront | Google Cloud CDN | Azure CDN |
+| **Domain & DNS** | Route 53 | Cloud DNS | Azure DNS |
+| **Secrets & Keys** | AWS Secrets Manager | Cloud Secret Manager | Azure Key Vault |
+
+---
+
+### 6. Cost Estimate
+The table below details rough estimated costs for hosting a scalable, production-grade cloud setup across user tiers.
+
+| Resource / Tier | MVP (~1,000 Users/Mo) | Growth (~10,000 Users/Mo) | Scale (~100,000 Users/Mo) |
+| :--- | :--- | :--- | :--- |
+| **Compute Instances** | $0 - $10 / mo (1x Cloud Run container) | $30 - $60 / mo (2-3 auto-scaling containers) | $200 - $400 / mo (Orchestrated cluster, e.g., EKS/GKE) |
+| **Database Services** | $0 / mo (Local SQLite DB file) | $15 - $30 / mo (Small managed DB instance) | $150 - $300 / mo (Multi-AZ Postgres with Read Replica) |
+| **Cache & CDN** | $0 / mo (CloudFront free tier) | $10 - $20 / mo (Basic CDN egress & small Redis cache) | $80 - $150 / mo (Production Redis cluster & high CDN egress) |
+| **Storage & DNS** | $1 - $3 / mo (S3 storage & Route 53) | $5 - $10 / mo (S3 storage, logs, & DNS queries) | $20 - $50 / mo (Large asset storage & full query logs) |
+| **Total Est. Cost** | **~$5 - $15 / month** | **~$60 - $120 / month** | **~$450 - $900 / month** |
+
+*Note: These estimates assume optimal caching of graph visualizations and static files at the CDN layer to minimize backend execution costs.*
+
+---
+
+### 7. Roadmap: MVP to Production-Grade
+
+```mermaid
+graph TD
+    Phase1[Phase 1: Containerization & Pre-rendering] --> Phase2[Phase 2: Database Migration & CDN Integration]
+    Phase2 --> Phase3[Phase 3: Headless API & Client-Side Graph Rendering]
+    Phase3 --> Phase4[Phase 4: Autoscaling Clusters, Auth, & Monitoring]
+```
+
+* **Phase 1: Containerization & Pre-rendering (Current → 1,000 users)**
+  * Bundle the Streamlit app into a Docker container.
+  * Stop dynamic graph HTML creation on page requests. Instead, pre-render all subject and global graphs during startup or as a post-build script.
+  * Replace runtime `sys.path` append hacks with structured package installs.
+* **Phase 2: Database Migration & CDN Integration (1,000 → 10,000 users)**
+  * Migrate markdown nodes and relationships out of flat files and into a PostgreSQL database.
+  * Store generated static PyVis graphs in an S3/Cloud Storage bucket. Set up CloudFront/Cloud CDN to serve them directly.
+  * Use `@st.cache_data` in Streamlit to cache node lists and Louvain partition data.
+* **Phase 3: Headless API & Client-Side Graph Rendering (10,000 → 100,000 users)**
+  * Build a decoupled backend API using **FastAPI** to serve node definitions and relationship coordinates.
+  * Rewrite the frontend using **Next.js** to statically generate LaTeX pages.
+  * Replace PyVis with a client-side library like **Sigma.js** or **D3.js** to render graphs dynamically in the browser, retrieving only raw JSON data from the backend.
+* **Phase 4: Autoscaling & Enterprise Ops (100,000+ users)**
+  * Deploy backend nodes on autoscaling orchestration engines (such as AWS ECS Fargate or Google Cloud Run).
+  * Configure primary/replica database architectures with PgBouncer connection pooling.
+  * Integrate user authentication (OAuth2 / Auth0) and rate-limiting.
+  * Set up monitoring pipelines using Prometheus, Grafana, and structured log aggregation.
+
+---
+
+## 11. Market Landscape & Competitive Analysis
+
+Understanding other platforms that map structured knowledge, academic pathways, or math concepts helps establish a clear differentiation strategy.
+
+### 1. Similar Apps & Companies
+Below are 10 tools and platforms that address knowledge mapping, academic relationships, and prerequisites:
+
+1. **Obsidian**
+   * **What they do:** A local-first, markdown-based personal knowledge base featuring an interactive global graph visualization of connected notes.
+   * **Tech Stack:** Electron, Node.js, React, TypeScript.
+   * **Business Model:** Free for personal use; paid add-ons for cloud synchronization and publishing (SaaS); commercial licensing.
+   * **Scale:** Est. 5M+ active users.
+   
+2. **Roam Research**
+   * **What they do:** A web-based outliner utility using a graph database to support bi-directional linking and personal networked thought.
+   * **Tech Stack:** ClojureScript, React, Datomic.
+   * **Business Model:** Paid subscription ($15/mo or $165/yr).
+   * **Scale:** Est. 100k - 200k active users.
+   
+3. **Wolfram Alpha / Wolfram Physics Project**
+   * **What they do:** Computational knowledge engines that query mathematical axioms, formulas, and scientific relationships, mapping physical and computational ontologies.
+   * **Tech Stack:** Wolfram Language, C/C++, Java, React.
+   * **Business Model:** Freemium, Pro subscription, and enterprise API access.
+   * **Scale:** Hundreds of millions of monthly queries.
+
+4. **Khan Academy**
+   * **What they do:** Online educational platform featuring structured pedagogical mastery trees that act as prerequisite learning paths for math and science.
+   * **Tech Stack:** Go, Python, React, React Native.
+   * **Business Model:** Non-profit (funded by donations, grants, and sponsorships).
+   * **Scale:** 100M+ registered users worldwide.
+
+5. **ResearchRabbit**
+   * **What they do:** An academic literature search engine that visualizes citations, co-authors, and paper relationships as an interactive connecting graph.
+   * **Tech Stack:** Node.js, React, WebGL graph libraries, Neo4j.
+   * **Business Model:** Free to use for academics (supported by institutional integrations).
+   * **Scale:** Est. 500k+ researchers and students.
+
+6. **Connected Papers**
+   * **What they do:** A visual tool that builds citation-based graphs showing the proximity and similarity of academic literature to speed up literature review.
+   * **Tech Stack:** Python, Flask, React, D3.js.
+   * **Business Model:** Freemium (5 free graph views per month; premium tiers start at $10/mo).
+   * **Scale:** Millions of graphs generated by researchers worldwide.
+
+7. **Elicit**
+   * **What they do:** An AI-powered research assistant that extracts mathematical claims, data, and citations from papers, mapping semantic connections.
+   * **Tech Stack:** React, Next.js, Python, PostgreSQL, Large Language Models (LLMs).
+   * **Business Model:** Freemium, subscription tiers starting at $12/mo.
+   * **Scale:** 1M+ monthly active users.
+
+8. **Kinopio**
+   * **What they do:** A spatial canvas and visual mapping tool designed for brainstorms, connections, and personal notes on an infinite field.
+   * **Tech Stack:** Node.js, Vue.js, SVG.
+   * **Business Model:** Freemium (free up to 150 cards; premium subscription for unlimited).
+   * **Scale:** Tens of thousands of users.
+
+9. **Metacademy**
+   * **What they do:** An open-source package providing prerequisite learning graphs for machine learning and statistics concepts.
+   * **Tech Stack:** Python, Django, JavaScript.
+   * **Business Model:** Open source / Academic free.
+   * **Scale:** Niche academic/student community.
+
+10. **Brilliant.org**
+    * **What they do:** Interactive learning paths for math, science, and computer science using interactive concept dependencies.
+    * **Tech Stack:** Python, Django, React, WebGL.
+    * **Business Model:** Subscription-only ($13.49/mo to $24.99/mo).
+    * **Scale:** 10M+ registered users.
+
+---
+
+### 2. Success Factors
+* **Visual Simplicity over Complexity:** Platforms like Connected Papers and ResearchRabbit succeed because they generate graphs *automatically* based on existing data (citations) rather than forcing users to manually construct every connection.
+* **Low Friction Note-taking:** Obsidian and Roam succeed by making node creation as simple as typing `[[Concept Name]]`, handling graph edge extraction behind the scenes.
+* **Prerequisite Guided Pathways:** Brilliant and Metacademy succeed because they answer the student's fundamental question: *"What do I need to learn before I can understand this equation?"*
+* **Local-First Speed:** Obsidian gained mass adoption because local Markdown files are fast, secure, and private.
+
+---
+
+### 3. Niche & Differentiation Opportunities
+Our project can carve out a unique space in the academic and mathematical ecosystem by leveraging the following:
+
+1. **LaTeX-First Derivation Graphing:**
+   * *Niche:* Most tools treat equations as static text. This app can explicitly map the steps of a derivation (e.g., showing how step $A$ and step $B$ combine algebraically to produce step $C$).
+2. **Open-Source Lecture Customization:**
+   * *Niche:* Create a self-hosted platform specifically designed for mathematics university professors. They can upload lecture notes as standard Markdown/LaTeX, and the system automatically structures prerequisite trees for their specific course curriculum.
+3. **Interactive SymPy/Proof Verification:**
+   * *Niche:* Integrate computer algebra systems (like **SymPy**) or interactive theorem provers (like **Lean**) directly into the node viewer. Clicking a mathematical transition in a derivation can prompt a backend symbolic compiler to verify the mathematical validity of the derivation step in real-time.
+4. **Automatic Dependency Inference:**
+   * *Niche:* Implement a parser that scans LaTeX notes for specific mathematical symbols (e.g., $\Sigma$, $\int$, $\otimes$) or keywords, auto-generating the prerequisite graph structure based on variable scoping and theorem dependencies.
+
+---
+
+## 12. System Flow Sequence Diagram
+
+The diagram below illustrates the interactive execution flow of the application when a user selects a mathematical concept, maps relationships, builds the graph, and interacts with the PyVis canvas.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User (Web Browser)
+    participant UI as Streamlit App (Frontend)
+    participant Loader as loaders.py
+    participant Builder as graph_builder.py
+    participant FS as Local Filesystem (subjects/)
+
+    User->>UI: Select Subject Page (e.g., numerical_matrix_analysis)
+    UI->>Loader: list_subjects()
+    Loader->>FS: Scan subjects/ directory
+    FS-->>Loader: List of subjects
+    UI->>Loader: load_subject_nodes(subject)
+    Loader->>FS: Read subject nodes (.md files)
+    FS-->>Loader: Map of node names & paths
+    UI->>Loader: load_relationships(subject)
+    Loader->>FS: Parse relationships/matrix_edges.json
+    FS-->>Loader: JSON edge list
+    
+    UI->>Builder: build_subject_graph(subject)
+    Note over Builder: Create Network instance
+    Builder->>Builder: Populate nodes & add directed edges
+    Builder->>FS: Write subject_graph.html
+    Builder->>Builder: inject_js_into_html(html_path)
+    Builder-->>UI: Return HTML output path
+
+    UI-->>User: Render Streamlit UI & embed PyVis Iframe
+    
+    User->>User: Click node in interactive graph
+    Note over User: Injected JS captures click
+    User->>UI: Update parent window URL (?selected_node=...)
+    UI->>Loader: Load specific Markdown node file
+    Loader->>FS: Read Markdown file
+    FS-->>Loader: File contents & LaTeX derivations
+    UI-->>User: Render LaTeX equations & sidebar details
+```
+
+---
+
 *For scratch notes, draft structures, and raw edge lists from earlier development, see [`notes.md`](notes.md).*
